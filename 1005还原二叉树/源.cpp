@@ -1,92 +1,78 @@
 #include<iostream>
 #include<vector>
 using namespace std;
-const int maxn = 33;
-vector<int> layer, pre, in, post;
+const int maxn = 35;
+vector<int> level, in;
+int n;
 
 struct node {
 	int data;
 	node *lchild, *rchild;
 };
 
-node* newNode(int x) {
+node* Creat(vector<int> level, int inL, int inR) {
+	if (level.size() == 0)return NULL;
 	node* root = new node;
-	root->data = x;
-	root->rchild = root->rchild = NULL;
-	return root;
-}
-
-node* creatTree(vector<int> layer, int inL, int inR) {
-	if (layer.size() == 0) {
-		return NULL;
-	}
-	node* root = newNode(layer[0]);
+	root->data = level[0];
+	root->lchild = root->rchild = NULL;
 	int k;
-	int x = layer[0];
-	for (k = inL; k < inR; k++) {
-		if (in[k] == x)
-			break;
+	for (k = inL; k <= inR; k++) {
+		if (in[k] == level[0])break;
 	}
-	vector<int> leftLayer, RightLayer;
-	for (int i = 1; i < layer.size(); i++) {
+	vector<int> left, right;
+	for (int i = 1; i < level.size(); i++) {
 		bool isleft = false;
-		for (int j = inL; j < k; j++) {
-			if (layer[i] == in[j]) {
-				isleft = true; break;
+		for (int j = 0; j < k; j++) {
+			if (in[j] == level[i]) {
+				isleft = true;
 			}
 		}
-		if (isleft) {
-			leftLayer.push_back(layer[i]);
-		} else
-			RightLayer.push_back(layer[i]);
+		if (isleft)left.push_back(level[i]);
+		else
+			right.push_back(level[i]);
 	}
-	root->lchild = creatTree(leftLayer, inL, k - 1);
-	root->rchild = creatTree(RightLayer, k + 1, inR);
+	root->lchild = Creat(left, inL, k - 1);
+	root->rchild = Creat(right, k + 1, inR);
 	return root;
 }
 
-void preOrder(node* root) {
+int num1 = 0;
+void pre(node* root) {
 	if (root == NULL)return;
-	pre.push_back(root->data);
-	preOrder(root->lchild);
-	preOrder(root->rchild);
+	printf("%d", root->data);
+	num1++;
+	if (num1 < n)
+		printf(" ");
+	else
+		printf("\n");
+	pre(root->lchild);
+	pre(root->rchild);
 }
 
-void postOrder(node* root) {
+int num2 = 0;
+void post(node* root) {
 	if (root == NULL)return;
-	postOrder(root->lchild);
-	postOrder(root->rchild);
-	post.push_back(root->data);
+	post(root->lchild);
+	post(root->rchild);
+	printf("%d", root->data);
+	num2++;
+	if (num2 < n)printf(" ");
+	else printf("\n");
 }
 int main() {
-	int n;
-	cin>> n;
-	for (int i = 1; i <= n; i++) {
+	cin >> n;
+	for (int i = 0; i < n; i++) {
 		int temp;
 		scanf("%d", &temp);
-		layer.push_back(temp);
+		level.push_back(temp);
 	}
-	for (int i = 1; i <= n; i++) {
+	for (int i = 0; i < n; i++) {
 		int temp;
 		scanf("%d", &temp);
 		in.push_back(temp);
 	}
-	node* root = creatTree(layer, 0, n - 1);
-	postOrder(root);
-	preOrder(root);
-	for (int i = 0; i < n; i++) {
-		printf("%d", pre[i]);
-		if (i < n - 1)
-			printf(" ");
-		else
-			printf("\n");
-	}
-	for (int i = 0; i < n; i++) {
-		printf("%d", post[i]);
-		if (i < n - 1)
-			printf(" ");
-		else
-			printf("\n");
-	}
+	node* root = Creat(level, 0, n - 1);
+	pre(root);
+	post(root);
 	return 0;
 }
